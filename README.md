@@ -1,215 +1,171 @@
 # Mintif
 
 <p align="center">
-  <img src="static/assets/mintif-logo.webp" alt="Mintif Logo" width="120">
+  <img src="static/assets/mintif-logo.webp" alt="Logo Mintif" width="120">
 </p>
 
-**Chatbot asisten HIMATIF dengan RAG · RAG-powered HIMATIF assistant chatbot**
+<p align="center">
+  <strong>Teman AI-mu Soal HIMATIF</strong><br>
+  Chatbot asisten HIMATIF dengan RAG — dibangun sepenuhnya di Android.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-blue?logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/Flask-3-black?logo=flask" alt="Flask">
+  <img src="https://img.shields.io/badge/RAG-FAISS%20%2B%20SQLite-green" alt="RAG">
+  <img src="https://img.shields.io/badge/LLM-Groq%20%2F%209router-orange" alt="LLM">
+  <img src="https://img.shields.io/badge/Embedding-Jina%20AI-purple" alt="Embedding">
+</p>
 
 ---
 
-## Project Overview / Tentang Project
+## Daftar Isi
 
-**🇮🇩** Mintif (Admin Teknologi Informasi) itu chatbot asisten HIMATIF yang gue buat buat jawab pertanyaan seputar HIMATIF (sejarah, struktur, kegiatan, ARTHASA). Konsepnya pakai RAG (Retrieval-Augmented Generation). Jadi gini, dokumen sumber dalam bentuk PDF dipecah jadi potongan kecil (chunk) per bab, lalu diubah jadi embedding, terus dicari secara semantik sebelum model AI nyusun jawaban. Setiap pengguna juga punya riwayat chat sendiri yang diisolasi pakai session cookie, jadi nggak saling ngacak.
-
-**🇬🇧** Mintif (Admin Teknologi Informasi) is a HIMATIF assistant chatbot I built to answer questions about HIMATIF (history, structure, events, ARTHASA). It uses a RAG (Retrieval-Augmented Generation) pipeline: source PDFs are split into small per-section chunks, turned into embeddings, then searched semantically before the AI model writes an answer. Every user also gets their own chat history, isolated via session cookies.
-
----
-
-## ✨ Features / Fitur Utama
-
-**🇮🇩**
-- **RAG pipeline**, jawabannya berbasis dokumen resmi, bukan ngarang.
-- **Semantic search**, pencarian FAISS pakai cosine similarity (embedding dinormalisasi).
-- **Riwayat per-user**, tiap browser punya history sendiri, bisa dihapus kapan aja.
-- **UI bertransisi**, ada animasi circle reveal antara halaman utama dan chatbot.
-- **Typing indicator**, ada indikator "AI sedang ngetik" plus auto-scroll.
-- **Responsive**, nyaman dipakai di HP maupun laptop.
-- **Production-ready**, pake gunicorn sebagai web server plus endpoint health check.
-
-**🇬🇧**
-- **RAG pipeline**, answers grounded in official documents, not made up.
-- **Semantic search**, FAISS retrieval with cosine similarity (normalized embeddings).
-- **Per-user history**, each browser keeps its own history, clearable anytime.
-- **Transitional UI**, circle reveal animation between the home page and chatbot.
-- **Typing indicator**, "AI is typing" feedback with auto-scroll.
-- **Responsive**, works well on phones and laptops.
-- **Production-ready**, gunicorn web server plus health check endpoint.
+- [Tentang Mintif](#tentang-mintif)
+- [Tampilan](#tampilan)
+- [Fitur](#fitur)
+- [Cara Kerja](#cara-kerja)
+- [Tech Stack](#tech-stack)
+- [Struktur Project](#struktur-project)
+- [Instalasi & Menjalankan](#instalasi--menjalankan)
+- [Environment Variables](#environment-variables)
+- [Data Knowledge](#data-knowledge)
+- [Daftar Route API](#daftar-route-api)
+- [Pantau & Monitoring](#pantau--monitoring)
+- [Deploy Produksi](#deploy-produksi)
+- [Dikembangkan di Android](#dikembangkan-di-android)
+- [Testing](#testing)
+- [Rencana Lanjut](#rencana-lanjut)
+- [Author](#author)
 
 ---
 
-## 🛠️ Tech Stack
+## Tentang Mintif
 
-**🇮🇩** Backend-nya Python (Flask). Buat retrieval pake FAISS + SQLite, embedding dari Jina AI, terus LLM-nya lewat 9router (router dengan fallback otomatis) yang meneruskan ke Groq, pakai SDK yang OpenAI-compatible. Frontend-nya vanilla JavaScript + CSS buat halaman utama dan chatbot (dulu React, udah dimigrasi penuh, arsipnya di branch `arsip/home-react` + release `react-final`).
+**Mintif** (Min = sapaan akrab Admin, TIF = Teknologi Informasi) adalah chatbot asisten resmi HIMATIF — Himpunan Mahasiswa Teknologi Informasi Universitas Tangerang Raya, Kabinet ARTHASA 2026. Panggil saja dia **Mimin**: ramah, akrab, dan gaul kayak admin betulan.
 
-**🇬🇧** Python (Flask) backend. FAISS + SQLite for retrieval, Jina AI for embeddings, and the LLM runs through 9router (a router with automatic fallback) which forwards to Groq, using an OpenAI-compatible SDK. The frontend is vanilla JavaScript + CSS for both the home page and the chatbot (previously React, fully migrated; archived in the `arsip/home-react` branch + `react-final` release).
+Konsepnya pakai **RAG (Retrieval-Augmented Generation)**: dokumen resmi HIMATIF dalam bentuk PDF dipecah jadi potongan kecil (chunk) per bab, diubah jadi embedding, lalu dicari secara semantik sebelum model AI menyusun jawaban. Jadi jawabannya berbasis data, bukan ngarang.
 
-| Layer | Teknologi |
+Ruang lingkup Mimin:
+
+- **Fakta HIMATIF** (sejarah, struktur, kegiatan, kepengurusan ARTHASA) — hanya dari knowledge.
+- **Data dosen TI** (nama, gelar, nomor kontak) — nomor dosen boleh dijawab langsung kalau ditanya, itu memang gunanya data ini.
+- **Sapaan & basa-basi** — dijawab singkat dan hangat.
+- **Di luar itu** (ilmu umum, MTK, resep, bola, kode, presiden) — ditolak halus 1 kalimat, diarahkan balik ke topik HIMATIF.
+
+Setiap pengguna punya riwayat chat sendiri yang terisolasi (per `user_id`), jadi tidak saling bocor.
+
+---
+
+## Tampilan
+
+| Web HIMATIF + FAB | Transisi Circle Reveal | Welcome Chatbot |
+|---|---|---|
+| <img src="docs/screenshots/fab.webp" alt="FAB Tanya Mintif di web HIMATIF" width="220"> | <img src="docs/screenshots/transisi.gif" alt="Transisi circle reveal web ke chatbot" width="220"> | <img src="docs/screenshots/welcome.webp" alt="Halaman welcome Mintif" width="220"> |
+
+| Chat — Jawaban Materi |
+|---|
+| <img src="docs/screenshots/chat.webp" alt="Chatbot Mintif menjawab pertanyaan" width="260"> |
+
+Alurnya: klik FAB **Tanya Mintif** di web HIMATIF → lingkaran menutup → halaman chatbot terbuka → lingkaran membuka. Simetris dua arah, tombol back di chat maupun tombol back HP sama-sama memutar animasi balik ke web.
+
+---
+
+## Fitur
+
+- **RAG per-bab** — 23 chunk dari 4 PDF resmi, jawaban nempel makna data.
+- **Pencarian semantik** — FAISS `IndexIDMap` + cosine similarity, threshold `0.55`, `top_k=15`.
+- **Normalisasi singkatan** — kahim, wakahim, sekum, bendum, kadep, dan imbuhan (`-nya/-ku/-mu`) dikenali sebelum embedding.
+- **Kepribadian Mimin** — mirror gaya bahasa user (gaul ↔ formal), format jawaban fleksibel (paragraf/poin/kombinasi), markdown dibatasi biar rapi di HP.
+- **Follow-up 2 saran** — tiap jawaban materi ditutup 2 topik lanjutan dari knowledge.
+- **Streaming (SSE)** — jawaban mengalir token-per-token lewat `POST /api/chat/stream`, plus mode non-stream biasa.
+- **Audit per-turn** — tabel `chat_audit` mencatat tiap pertanyaan: `user_id`, IP, endpoint, `hit_knowledge`, latensi, error, dan alasan miss (`oot`/`gatau`/`chit`).
+- **Rate limit** — `15/menit; 200/jam` per API, kuncinya ikut `user_id` biar maba di NAT kampus (satu IP rame-rame) tidak saling makan jatah.
+- **Batas pesan 500 karakter** — kepanjangan ditolak halus (413) biar hemat token.
+- **Sanitasi deterministik** — markdown berat (tabel pipa, code block, `---`, emoji) dilucuti sebelum disimpan dan saat streaming.
+- **Riwayat per-user** — tiap browser punya history sendiri (6 pesan terakhir dipakai sebagai konteks LLM), bisa dihapus kapan saja tanpa menyentuh audit.
+- **Sensor privasi** — atribut sensitif (NIM, ultah, sosmed, alamat) hanya keluar kalau user eksplisit menanyakannya.
+- **Transisi circle GPU** — animasi pakai `transform: scale()`, mulus di HP kentang.
+- **Responsif** — nyaman di HP maupun laptop.
+- **Production-ready** — gunicorn + endpoint `/health` buat watcher/monitor.
+
+---
+
+## Cara Kerja
+
+```
+PDF -> clean_text -> chunking per bab (heading bernomor + sub-split)
+                       |
+                       v
+            SQLite (chunk + sumber)      FAISS index (embedding Jina)
+                       |                              ^
+                       |                              |
+                       +-----> query -> embedding ----+
+                                |
+                 context + riwayat (6 pesan) |
+                                v
+               system prompt -> 9router/Groq -> jawaban Mimin
+                                |
+                                v
+                    petik tag -> audit (chat_audit)
+```
+
+1. **Ingestion** — PDF dibaca (pypdf), dibersihkan (dedup header tabel, perbaikan artefak spasi ekstraksi, em-dash jadi hyphen), lalu dipecah per bab mengikuti heading bernomor. Bab yang panjang dipecah lagi per sub-bagian. Hasil saat ini: **23 chunk**.
+2. **Indexing** — tiap chunk di-embedding pakai Jina (`jina-embeddings-v5-text-small`, 1024 dimensi), disimpan di SQLite, dan vektornya masuk index FAISS. `IndexIDMap` menjaga id FAISS sinkron dengan id SQLite. Tulis index atomik (`knowledge.index.tmp` → `knowledge.index`).
+3. **Query** — pertanyaan user dinormalisasi dulu (singkatan → istilah knowledge), di-embedding (LRU cache 512), lalu dicari dengan cosine similarity (`top_k=15`, lolos kalau skor ≥ `0.55`). Chunk yang lolos digabung jadi context, label internal `[Bab X]` dicopot biar Mimin tidak mengutip struktur dokumen ke user.
+4. **Generation** — context + 6 pesan riwayat terakhir + system prompt (~4,5rb karakter) dikirim ke LLM lewat 9router (fallback otomatis) atau langsung ke Groq. Jawaban ditutup 1 tag sistem (`[OK]`/`[GATAU]`/`[OOT]`/`[CHIT]`) yang dicopot sebelum tampil ke user tapi dicatat ke audit.
+
+---
+
+## Tech Stack
+
+| Lapisan | Teknologi |
 |---|---|
-| Backend | Python 3, Flask 3, gunicorn 23 |
-| RAG / Vector | FAISS (IndexIDMap, cosine), numpy |
-| Storage | SQLite (history + knowledge) |
+| Backend | Python 3.10, Flask 3.1.3, gunicorn 23 (produksi), waitress 3.0.2 |
+| RAG / Vektor | faiss-cpu 1.14.3 (`IndexIDMap` + `IndexFlatIP`, cosine), numpy 2.2.6 |
+| Penyimpanan | SQLite (WAL) — tabel `history`, `knowledge`, `chat_audit` |
 | Embedding | Jina AI `jina-embeddings-v5-text-small` (1024-d) |
-| LLM | 9router `GPT-120B-Fallback` (fallback otomatis) / Groq `openai/gpt-oss-120b` via openai SDK |
-| PDF | pypdf |
-| Frontend | Vanilla JS + CSS (home + chatbot) |
+| LLM | 9router `GPT-120B-Fallback` (fallback otomatis) / Groq `openai/gpt-oss-120b` via SDK OpenAI-compatible |
+| PDF | pypdf 6.14.2 |
+| Frontend | Vanilla JS + CSS (`home` + `chatbot`), integrasi FAB + circle reveal ke web HIMATIF (Vue, repo terpisah) |
+| Rate limit | flask-limiter 4.1.1 (`memory://`) |
 
 ---
 
-## 🧠 Architecture / How It Works
-
-**🇮🇩**
+## Struktur Project
 
 ```
-PDF -> clean_text -> chunking per bab (heading 1-6 + sub-split, 400-800 karakter)
-                       |
-                       v
-                SQLite (chunk + sumber)         FAISS index (embedding)
-                       |                                ^
-                       |                                |
-                       +-----> query -> embedding ------+
-                                |
-                 context + riwayat |
-                                v
-                        Prompt -> Groq LLM -> Jawaban
-```
-
-1. **Ingestion**, PDF dibaca (pypdf), dibersihin (dedup header tabel, fix artefak spasi, em-dash jadi hyphen), lalu dipecah per bab mengikuti heading bernomor, bab yang panjang dipecah lagi per sub-bagian sampai 400-800 karakter.
-2. **Indexing**, tiap chunk di-embedding (Jina), disimpan di SQLite, dan vector-nya masuk ke index FAISS. Pakai `IndexIDMap` biar id-nya sinkron sama database.
-3. **Query**, pertanyaan user di-embedding lalu dicari secara cosine (ambil 5 teratas). Chunk yang relevan digabung jadi context.
-4. **Generation**, context + riwayat chat (10 pesan terakhir) + system prompt dikirim ke 9router (fallback otomatis), lalu jawabannya disimpan ke history user.
-
-**🇬🇧**
-
-```
-PDF -> clean_text -> per-section chunking (numbered headings + sub-split, 400-800 chars)
-                       |
-                       v
-                SQLite (chunk + source)         FAISS index (embedding)
-                       |                                ^
-                       |                                |
-                       +-----> query -> embedding ------+
-                                |
-                 context + history |
-                                v
-                        Prompt -> Groq LLM -> Answer
-```
-
-1. **Ingestion**, PDFs are read (pypdf), cleaned (table-header dedup, spacing-artefact fixes, em-dash to hyphen), and split per section following numbered headings, long sections sub-split to 400-800 chars.
-2. **Indexing**, each chunk is embedded (Jina), stored in SQLite, and its vector goes into the FAISS index. `IndexIDMap` keeps the ids in sync with the database.
-3. **Query**, the user question is embedded and searched with cosine similarity (top 5). Relevant chunks become the context.
-4. **Generation**, context + chat history (last 10 messages) + system prompt are sent to 9router (automatic fallback), and the answer is stored in the user's history.
-
----
-
-## 📱 Full Android Development
-
-**🇮🇩** Ini bagian yang paling bikin project ini beda: seluruh codebase Mintif dikembangin di dalam Android, bukan di PC.
-
-> Penting: Android di sini itu environment development, bukan platform target. Ini bukan aplikasi Android. Mintif tetaplah aplikasi web full-stack biasa, cuma kodenya ditulis, dites, dan di-debug dari Android.
-
-**Setup development yang dipakai:**
-
-| Komponen | Alat |
-|---|---|
-| Linux environment | Termux + Andronix |
-| Version control | Git (clone, branch, commit, push ke GitHub) |
-| Backend | Python + Flask, virtualenv |
-| Frontend | Node.js/npm (untuk 9router produksi, repo terpisah) |
-| Code editor (opsional) | Acode |
-
-**Keterbatasan environment yang berhasil diatasi:**
-- **Layar kecil dan tanpa mouse**, jadi alurnya keyboard-first dan editor yang ringan.
-- **Resource Android terbatas**, jadi build sama index dibuat seefisien mungkin, index FAISS di-load hemat memori.
-- **Dependency native**, package kayak `faiss-cpu` di-build dan dites langsung di lingkungan Linux Android.
-- **Workflow remote**, semua commit dan push jalan langsung dari Android ke GitHub.
-
-Ini bukan gimmick, ini constraint engineering yang nyata. Setiap fix bug, refactor, dan fitur di repo ini lahir dari Android.
-
-**🇬🇧** This is what makes this project different: the entire Mintif codebase was developed on an Android device, not on a PC.
-
-> Important: Android here is the development environment, not the target platform. This is not an Android app. Mintif is still a regular full-stack web application, it just happens to be written, tested, and debugged from Android.
-
-**Development setup used:**
-
-| Component | Tool |
-|---|---|
-| Linux environment | Termux + Andronix |
-| Version control | Git (clone, branch, commit, push to GitHub) |
-| Backend | Python + Flask, virtualenv |
-| Frontend | Node.js/npm (untuk 9router produksi, repo terpisah) |
-| Code editor (optional) | Acode |
-
-**Environment constraints that were overcome:**
-- **Small screen and no mouse**, so keyboard-first workflow and lightweight editors.
-- **Limited Android resources**, so builds and the index were kept efficient, and the FAISS index is loaded memory-aware.
-- **Native dependencies**, packages like `faiss-cpu` are built and tested directly in Android's Linux environment.
-- **Remote workflow**, every commit and push goes straight from Android to GitHub.
-
-This isn't a gimmick, it's a real engineering constraint. Every bug fix, refactor, and feature in this repo was born on Android.
-
----
-
-## 💻 Supported Platforms
-
-**🇮🇩** Karena Mintif itu aplikasi web biasa, dia bisa dijalankan dan dikembangin di hampir semua platform selama environment dan dependency-nya keinstall:
-
-- **Windows**, Python 3.8+, Node.js (untuk 9router produksi, repo terpisah).
-- **macOS**, Python 3.8+, Node.js (untuk 9router produksi, repo terpisah).
-- **Linux**, Python 3.8+, Node.js (untuk 9router produksi, repo terpisah).
-- **Android**, Termux (+ Andronix), Python, Node.js/npm (untuk 9router produksi, repo terpisah), Git, dan Acode sebagai editor opsional.
-
-Developer lain cukup `git clone` terus ikutin panduan di bawah, bisa langsung dikembangin dari Android dengan cara yang sama.
-
-**🇬🇧** Since Mintif is a regular web application, it runs and can be developed on almost any platform as long as the environment and dependencies are installed:
-
-- **Windows**, Python 3.8+, Node.js (for production 9router, separate repo).
-- **macOS**, Python 3.8+, Node.js (for production 9router, separate repo).
-- **Linux**, Python 3.8+, Node.js (for production 9router, separate repo).
-- **Android**, Termux (+ Andronix), Python, Node.js/npm (for production 9router, separate repo), Git, and Acode as optional editor.
-
-Other developers can just `git clone` and follow the guide below, and can even develop from Android the exact same way.
-
----
-
-## 📁 Project Structure
-
-**🇮🇩** Struktur project secara ringkas.
-
-**🇬🇧** Project structure in short.
-
-```
-pillow-fox/
-├── app.py               # Flask entry point, routes, health check
-├── ai.py                # LLM client (9router/Groq via OpenAI-compatible SDK)
-├── chatbot.py           # RAG retrieval + prompt assembly
-├── rag.py               # PDF ingestion: clean, chunk, embed
-├── embedding.py         # Jina embedding client
-├── vector_db.py         # FAISS index (cosine-normalized) + rebuild
-├── database.py          # SQLite layer (history, knowledge)
-├── history.py           # Per-user history helpers
-├── knowledge.py         # PDF discovery
-├── prompt.py            # System prompt for the AI
+mintif/
+├── app.py               # Entry Flask: routes, rate limit, session, audit, SSE
+├── ai.py                # Klien LLM (9router/Groq via SDK OpenAI) + sanitasi markdown
+├── chatbot.py           # RAG: normalisasi alias, retrieval FAISS, rakit prompt
+├── prompt.py            # System prompt Mimin (identitas, scope, gaya flat, few-shot)
+├── rag.py               # Ingestion PDF: clean, chunk per bab, embed, simpan
+├── embedding.py         # Klien embedding Jina (LRU cache 512)
+├── vector_db.py         # Index FAISS (cosine) + rebuild + atomic write
+├── database.py          # Lapisan SQLite (history, knowledge, audit + migrasi)
+├── history.py           # Helper riwayat per-user (truncate khusus LLM)
+├── knowledge.py         # Discovery file PDF sumber
 ├── requirements.txt
 ├── templates/
 │   ├── home.html        # Halaman utama (vanilla JS)
-│   └── chatbot.html     # Chatbot UI (vanilla JS)
-├── static/              # home.css, home.js, chatbot.css, chatbot.js, assets
-└── knowledge/pdf/       # Source documents (PDFs)
+│   └── chatbot.html     # UI chatbot (vanilla JS + SSE)
+├── static/
+│   ├── js/              # home.js, chatbot.js
+│   ├── css/             # home.css, chatbot.css
+│   └── assets/          # logo, FAB, ikon
+├── knowledge/pdf/       # Dokumen sumber PDF (gitignored)
+└── docs/screenshots/    # Screenshot + GIF buat README ini
 ```
 
 ---
 
-## 🚀 Installation & Usage
-
-**🇮🇩** Cara install dan jalankan.
-
-**🇬🇧** How to install and run.
+## Instalasi & Menjalankan
 
 ```bash
 # 1. Clone
-git clone https://github.com/itsriojg/Fox-AI.git
-cd Fox-AI
+git clone https://github.com/itsriojg/Mintif.git
+cd mintif
 
 # 2. Backend
 python -m venv venv
@@ -221,121 +177,170 @@ cp .env.example .env            # isi API key-nya, lihat tabel di bawah
 python app.py                   # buka http://localhost:5000
 
 # 4. Jalankan (mode production)
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+gunicorn -w 2 --threads 8 --worker-class gthread --timeout 60 -b 0.0.0.0:5000 app:app
 ```
 
-Cek health: `curl http://localhost:5000/health` -> `{"status":"ok"}`.
+Cek health: `curl http://localhost:5000/health` → `{"status":"ok"}`.
+
+Catatan: saat pertama jalan, knowledge dibangun otomatis dari PDF (`build_knowledge()` memanggil API Jina — butuh `JINA_API_KEY` + koneksi). Di produksi, index di-prebuild sekali biar tidak cold-start.
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
-**🇮🇩** Variabel environment dibaca dari file `.env` di root project.
+Dibaca dari file `.env` di root project. Jangan pernah commit file ini.
 
-**🇬🇧** Environment variables are read from a `.env` file in the project root.
-
-| Variable | Wajib | Deskripsi / Description |
+| Variable | Wajib | Deskripsi |
 |---|---|---|
-| `SECRET_KEY` | ✅ | Kunci sesi Flask (session cookie) / Flask session secret |
-| `JINA_API_KEY` | ✅ | Kunci API Jina AI (embedding) / Jina AI API key |
-| `AI_BASE_URL` | ✅* | Base URL 9router, contoh `http://localhost:20128/v1` / 9router base URL |
-| `AI_API_KEY` | ✅* | API key 9router (dari dashboard) / 9router API key |
-| `AI_MODEL` | Tidak | Nama model/combo di 9router, default `GPT-120B-Fallback` |
-| `GROQ_API_KEY` | ✅* | Kunci API Groq langsung (LLM) / Groq API key (direct mode) |
-| `GROQ_BASE_URL` | ✅* | Base URL endpoint Groq / Groq endpoint base URL |
-| `HOST` | Tidak | Host bind, default `0.0.0.0` |
-| `PORT` | Tidak | Port bind, default `5000` |
+| `SECRET_KEY` | Ya (produksi) | Kunci sesi Flask. Otomatis digenerate kalau kosong, tapi di produksi wajib diisi permanen biar sesi tidak chaos antar worker. |
+| `JINA_API_KEY` | Ya | API key Jina AI buat embedding. |
+| `AI_BASE_URL` | Salah satu | Base URL 9router, misal `http://localhost:20128/v1` (ada fallback otomatis). |
+| `AI_API_KEY` | Salah satu | API key 9router (dari dashboard). |
+| `AI_MODEL` | Tidak | Nama model/combo di 9router, default `GPT-120B-Fallback`. |
+| `GROQ_API_KEY` | Salah satu | API key Groq (mode langsung, tanpa router). |
+| `GROQ_BASE_URL` | Salah satu | Base URL Groq, `https://api.groq.com/openai/v1`. |
+| `AI_MAX_TOKENS` | Tidak | Override budget token (default 1500 via router, 500 langsung). |
+| `HOST` / `PORT` | Tidak | Bind server, default `0.0.0.0:5000`. |
+| `HTTPS` | Produksi | `1` di produksi HTTPS (menyalakan cookie Secure + SameSite). |
+| `FRONTEND_ORIGIN` | Integrasi web | Origin frontend Vue yang boleh memanggil `/api/*` (comma-separated). |
+| `HOME_URL` | Integrasi web | Tujuan tombol back di `/chatbot` + reverse circle reveal. |
 
-`SECRET_KEY` otomatis digenerate kalau kosong, biar session tetap aman di dev.
-
-> `✅*` artinya wajib pilih **salah satu**: isi `AI_BASE_URL` + `AI_API_KEY` (lewat 9router, ada fallback otomatis) **atau** `GROQ_API_KEY` + `GROQ_BASE_URL` (langsung ke Groq). Tanpa router, aplikasi otomatis memakai Groq langsung.
-
----
-
-## 🧪 Testing
-
-**🇮🇩** Project ini belum punya test suite otomatis (pytest/unittest). Sejauh ini pengujiannya verifikasi manual end-to-end lewat HTTP:
-
-- Cek semua route utama (`/`, `/chatbot`, `/health`, `/api/chat`, `/clear`).
-- Isolasi history antar-user, dua session beda dikirim pesan dan dipastiin nggak saling bocor. Hapus history satu user nggak nyentuh user lain.
-- Verifikasi RAG, query jalan, context keambil, dan jawaban model balik.
-- Verifikasi index FAISS, rebuild index dari database dan konsistensi id (via `IndexIDMap`).
-
-**🇬🇧** The project does not have an automated test suite (pytest/unittest) yet. So far testing has been manual end-to-end verification over HTTP:
-
-- Check all main routes (`/`, `/chatbot`, `/health`, `/api/chat`, `/clear`).
-- Per-user history isolation, two separate sessions send messages and are verified not to leak into each other. Clearing one user's history doesn't touch another's.
-- RAG verification, queries flow through, context is retrieved, and the model answer comes back.
-- FAISS verification, index rebuild from the database and id consistency (via `IndexIDMap`).
+> Wajib isi **salah satu jalur LLM**: `AI_BASE_URL` + `AI_API_KEY` (lewat 9router) **atau** `GROQ_API_KEY` + `GROQ_BASE_URL` (langsung ke Groq).
 
 ---
 
-## 📚 Development Journey
+## Data Knowledge
 
-**🇮🇩** Perjalanan project ini (62+ commits) nunjukin evolusi teknis yang beneran:
+4 dokumen sumber (gitignored, ada di `knowledge/pdf/`):
 
-1. **Dari template jadi full-stack**, layout chatbot dasar, terus responsive, terus UI/UX lengkap.
-2. **Migrasi integrasi AI**, dari fetch API langsung ke SDK OpenAI-compatible, dengan timeout dan error handling yang makin rapi.
-3. **RAG pipeline dari nol**, PDF ke chunk ke FAISS, terus di-harden: mapping id SQLite ke FAISS pakai `IndexIDMap`, normalisasi embedding (cosine), dan proses build knowledge yang aman dari kegagalan.
-4. **Frontend vanilla**, halaman utama dimigrasi balik dari React (Vite) ke vanilla JS + CSS dengan animasi circle reveal yang sama (arsip React: branch `arsip/home-react` + release `react-final`).
-5. **Multi-user**, history chat dipisah per user pakai session cookie, lengkap dengan migrasi tabel otomatis.
-6. **Production-ready**, gunicorn, health check, dan bind host/port lewat environment.
+| Dokumen | Isi |
+|---|---|
+| `DATA HIMATIF FOR WEB DEPT LITBANG.pdf` | Sejarah, visi-misi, struktur, kegiatan HIMATIF |
+| `KEPENGURUSAN HIMATIF KABINET ARTHASA 2026.pdf` | 36 pengurus Kabinet ARTHASA 2026 |
+| `DATA DOSEN TI.pdf` | 31 dosen TI (nama, gelar, nomor kontak) |
+| `BRANDING MINTIF ARTHASA.pdf` | Identitas brand Mintif + ARTHASA |
 
-**🇬🇧** The project journey (62+ commits) shows a real technical evolution:
+Total **23 chunk**. Data pribadi disensor: NIM, tanggal lahir lengkap, dan kontak selain dosen tidak keluar kecuali user eksplisit menanyakannya.
 
-1. **From template to full-stack**, basic chatbot layout, then responsive, then complete UI/UX.
-2. **AI integration migration**, from raw fetch API to the OpenAI-compatible SDK, with better timeout and error handling.
-3. **RAG pipeline from scratch**, PDF to chunk to FAISS, then hardened: SQLite to FAISS id mapping with `IndexIDMap`, embedding normalization (cosine), and a failure-safe knowledge build.
-4. **Vanilla frontend**, the home page was migrated back from React (Vite) to vanilla JS + CSS with the same circle reveal transition (React archive: `arsip/home-react` branch + `react-final` release).
-5. **Multi-user**, chat history isolated per user with session cookies, including automatic table migration.
-6. **Production-ready**, gunicorn, health check, and host/port binding via environment.
+Rebuild knowledge (misal habis ubah `rag.py` atau threshold): hapus `database.db` + `knowledge.index`, lalu restart `app.py` — atau panggil `rebuild_faiss()` manual.
 
 ---
 
-## 💡 What I Learned
+## Daftar Route API
 
-**🇮🇩**
-- Ngerakit pipeline RAG end-to-end, dari dokumen mentah sampai jawaban yang berbasis data.
-- Troubleshooting vektor dan database, sinkronisasi id FAISS ke SQLite, normalisasi embedding, dan strategi atomic write.
-- Ngatur sesi dan privacy user, pakai session cookie dan migrasi skema database.
-- Nulis kode production-grade dari environment yang terbatas, disiplin commit, error handling, dan verifikasi manual yang sistematis.
+| Method | Route | Fungsi |
+|---|---|---|
+| `GET` | `/` | Halaman utama |
+| `GET` | `/chatbot` | UI chatbot (render riwayat user) |
+| `GET` | `/health` | Health check → `{"status":"ok"}` |
+| `POST` | `/api/chat` | Chat biasa (JSON: `pesan`, `user_id`) → `{"reply": ...}` |
+| `POST` | `/api/chat/stream` | Chat streaming (SSE, JSON yang sama) |
+| `POST` | `/clear` | Hapus riwayat user (audit tidak ikut terhapus) |
 
-**🇬🇧**
-- Building a full RAG pipeline, from raw documents to grounded answers.
-- Vector and database troubleshooting, FAISS to SQLite id sync, embedding normalization, and atomic-write strategies.
-- Managing sessions and user privacy with session cookies and database schema migration.
-- Writing production-grade code from a constrained environment, with commit discipline, error handling, and systematic manual verification.
+Contoh:
 
----
-
-## 🔮 Future Improvements
-
-**🇮🇩** Ide yang realistis buat dilanjutin:
-
-- Tambah test suite otomatis (pytest) buat endpoint dan RAG.
-- Migrasi database ke PostgreSQL buat skala lebih gede dan concurrency tulis lebih tinggi.
-- Fitur unggah dokumen lewat UI (folder `uploads/` udah disiapin).
-- Rombak UI chatbot dengan identitas Arthasa (avatar, aksen marun, FAQ).
-- Rate limiting di endpoint chat.
-
-**🇬🇧** Realistic ideas to continue with:
-
-- Add an automated test suite (pytest) for endpoints and RAG.
-- Migrate to PostgreSQL for larger scale and higher write concurrency.
-- Document upload feature via the UI (the `uploads/` folder is already in place).
-- Rework the chatbot UI with the Arthasa identity (avatar, maroon accents, FAQ).
-- Rate limiting on the chat endpoint.
+```bash
+curl -X POST http://localhost:5000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"pesan":"Siapa ketua HIMATIF saat ini?","user_id":"coba-1"}'
+```
 
 ---
 
-## 👤 Author
+## Pantau & Monitoring
 
-**🇮🇩** Dibuat oleh [itsriojg](https://github.com/itsriojg). Seluruh project dibangun dari Android, dari commit pertama sampai sekarang.
+Tiap pertanyaan tercatat 1 baris di tabel `chat_audit` (`user_id`, `ip`, `endpoint`, `user_text`, `hit_knowledge`, `latency_ms`, `error`, `miss_reason`). Contoh query sqlite langsung di server:
 
-**🇬🇧** Built by [itsriojg](https://github.com/itsriojg). The entire project was built on Android, from the very first commit to now.
+```sql
+-- Pertanyaan yang tidak terjawab knowledge hari ini (bahan tambah PDF)
+SELECT user_text, COUNT(*) c FROM chat_audit
+WHERE date(created_at) = date('now','localtime') AND miss_reason = 'gatau'
+GROUP BY user_text ORDER BY c DESC LIMIT 10;
+
+-- Latensi rata-rata per jam (normal 2-10 detik, waspada >20-30 detik)
+SELECT strftime('%H', created_at) jam, AVG(latency_ms)/1000.0 rata_dtk, COUNT(*) n
+FROM chat_audit WHERE date(created_at) = date('now','localtime')
+GROUP BY jam ORDER BY jam;
+
+-- IP paling aktif (deteksi spam)
+SELECT ip, COUNT(*) c FROM chat_audit
+WHERE date(created_at) = date('now','localtime')
+GROUP BY ip ORDER BY c DESC LIMIT 10;
+```
+
+Patokan: miss `gatau` yang numpuk dengan pertanyaan mirip = sinyal tambah dokumen; 1 IP brutal = spam.
+
+---
+
+## Deploy Produksi
+
+- **Server**: VPS KVM-2 (1 CPU / 2 GB), Ubuntu 22.04, hostname `mintif.himatifuntara.com`.
+- **App**: gunicorn `-w 2 --threads 8 --worker-class gthread --timeout 60 --backlog 256` (I/O-bound nunggu Jina/Groq — threads yang menahan puluhan user, bukan jumlah worker).
+- **Depan**: Nginx (reverse proxy + TLS, `proxy_buffering off` + `proxy_read_timeout 90s` buat SSE) → gunicorn `:5000` → Flask.
+- **Integrasi web**: frontend Vue (repo terpisah) manggil `/api/*` via CORS (`FRONTEND_ORIGIN`), tombol back mengarah ke `HOME_URL`. URL LLM dan home di sisi Vue bersifat build-time (`VITE_MINTIF_API_URL`) — ganti URL wajib rebuild.
+- **Keamanan server**: user non-root + SSH key-only, UFW (22/80/443), fail2ban, SQLite WAL.
+- **Kapasitas**: nyaman 5-10 in-flight / 30-60 pengguna aktif santai; bottleneck di upstream LLM/embedding, bukan CPU.
+
+---
+
+## Dikembangkan di Android
+
+Bagian yang bikin project ini beda: seluruh codebase Mintif dikembangkan di dalam Android, bukan di PC.
+
+> Penting: Android di sini itu environment development, bukan platform target. Ini bukan aplikasi Android. Mintif tetap aplikasi web full-stack biasa — cuma kodenya ditulis, dites, dan di-debug dari Android.
+
+**Setup yang dipakai:**
+
+| Komponen | Alat |
+|---|---|
+| Linux environment | Termux + Andronix |
+| Version control | Git (clone, branch, commit, push ke GitHub) |
+| Backend | Python + Flask, virtualenv |
+| Frontend | Node.js/npm (untuk tooling produksi) |
+| Code editor (opsional) | Acode |
+
+**Keterbatasan yang berhasil diatasi:**
+
+- **Layar kecil dan tanpa mouse** — alur keyboard-first, editor ringan.
+- **Resource terbatas** — build dan index dibuat seefisien mungkin, FAISS di-load hemat memori.
+- **Dependency native** — `faiss-cpu` di-build dan dites langsung di lingkungan Linux Android.
+- **Workflow remote** — semua commit, push, dan deploy jalan langsung dari Android ke GitHub/VPS.
+
+Ini bukan gimmick, ini constraint engineering yang nyata. Setiap fix bug, refactor, dan fitur di repo ini (108 commit) lahir dari Android.
+
+Karena Mintif aplikasi web biasa, dia tetap bisa dijalankan dan dikembangkan di platform apapun (Windows/macOS/Linux, Python 3.8+) — cukup `git clone` lalu ikuti panduan instalasi di atas.
+
+---
+
+## Testing
+
+Project ini belum punya test suite otomatis (pytest/unittest). Pengujiannya verifikasi manual end-to-end lewat HTTP:
+
+- Semua route utama (`/`, `/chatbot`, `/health`, `/api/chat`, `/api/chat/stream`, `/clear`).
+- Isolasi history antar-user: dua session berbeda dikirim pesan, dipastikan tidak saling bocor. Hapus history satu user tidak menyentuh user lain.
+- Verifikasi RAG: query jalan, context keambil (skor ≥ threshold), jawaban model balik dengan tag yang benar.
+- Verifikasi index FAISS: rebuild dari database, konsistensi id via `IndexIDMap`.
+- Streaming: token mengalir, sanitasi jalan live, pesan tersimpan utuh.
+- Sintaks JS: `node --check static/js/chatbot.js` (+ `home.js`).
+
+---
+
+## Rencana Lanjut
+
+- Test suite otomatis (pytest) buat endpoint dan RAG.
+- Migrasi database ke PostgreSQL buat skala lebih besar dan concurrency tulis lebih tinggi.
+- Fitur unggah dokumen lewat UI.
+- Rombak UI chatbot dengan identitas ARTHASA penuh (avatar, aksen marun, FAQ).
+- Uptime monitor eksternal ke `/health` + watcher cron + backup DB harian (Fase 6 pasca-PKKMB).
+
+---
+
+## Author
+
+Dibuat oleh [itsriojg](https://github.com/itsriojg). Seluruh project dibangun dari Android, dari commit pertama sampai sekarang.
 
 ---
 
 <p align="center">
-  <sub> Built entirely on Android · Dibangun sepenuhnya di Android</sub>
+  <sub>Built entirely on Android · Dibangun sepenuhnya di Android</sub>
 </p>
