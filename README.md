@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Teman AI-mu Soal HIMATIF</strong><br>
-  Chatbot asisten HIMATIF dengan RAG — dibangun sepenuhnya di Android.
+  Chatbot asisten HIMATIF dengan RAG, dibangun sepenuhnya di Android.
 </p>
 
 <p align="center">
@@ -42,16 +42,16 @@
 
 ## Tentang Mintif
 
-**Mintif** (Min = sapaan akrab Admin, TIF = Teknologi Informasi) adalah chatbot asisten resmi HIMATIF — Himpunan Mahasiswa Teknologi Informasi Universitas Tangerang Raya, Kabinet ARTHASA 2026. Panggil saja dia **Mimin**: ramah, akrab, dan gaul kayak admin betulan.
+**Mintif** (Min = sapaan akrab Admin, TIF = Teknologi Informasi) adalah chatbot asisten resmi HIMATIF, Himpunan Mahasiswa Teknologi Informasi Universitas Tangerang Raya, Kabinet ARTHASA 2026. Panggil saja dia **Mimin**: ramah, akrab, dan gaul kayak admin betulan.
 
 Konsepnya pakai **RAG (Retrieval-Augmented Generation)**: dokumen resmi HIMATIF dalam bentuk PDF dipecah jadi potongan kecil (chunk) per bab, diubah jadi embedding, lalu dicari secara semantik sebelum model AI menyusun jawaban. Jadi jawabannya berbasis data, bukan ngarang.
 
 Ruang lingkup Mimin:
 
-- **Fakta HIMATIF** (sejarah, struktur, kegiatan, kepengurusan ARTHASA) — hanya dari knowledge.
-- **Data dosen TI** (nama, gelar, nomor kontak) — nomor dosen boleh dijawab langsung kalau ditanya, itu memang gunanya data ini.
-- **Sapaan & basa-basi** — dijawab singkat dan hangat.
-- **Di luar itu** (ilmu umum, MTK, resep, bola, kode, presiden) — ditolak halus 1 kalimat, diarahkan balik ke topik HIMATIF.
+- **Fakta HIMATIF** (sejarah, struktur, kegiatan, kepengurusan ARTHASA): hanya dari knowledge.
+- **Data dosen TI** (nama, gelar, nomor kontak), nomor dosen boleh dijawab langsung kalau ditanya, itu memang gunanya data ini.
+- **Sapaan & basa-basi**: dijawab singkat dan hangat.
+- **Di luar itu** (ilmu umum, MTK, resep, bola, kode, presiden): ditolak halus 1 kalimat, diarahkan balik ke topik HIMATIF.
 
 Setiap pengguna punya riwayat chat sendiri yang terisolasi (per `user_id`), jadi tidak saling bocor.
 
@@ -63,7 +63,7 @@ Setiap pengguna punya riwayat chat sendiri yang terisolasi (per `user_id`), jadi
 |---|---|---|
 | <img src="docs/screenshots/fab.webp" alt="FAB Tanya Mintif di web HIMATIF" width="220"> | <img src="docs/screenshots/transisi.gif" alt="Transisi circle reveal web ke chatbot" width="220"> | <img src="docs/screenshots/welcome.webp" alt="Halaman welcome Mintif" width="220"> |
 
-| Chat — Jawaban Materi |
+| Chat: Jawaban Materi |
 |---|
 | <img src="docs/screenshots/chat.webp" alt="Chatbot Mintif menjawab pertanyaan" width="260"> |
 
@@ -73,21 +73,21 @@ Alurnya: klik FAB **Tanya Mintif** di web HIMATIF → lingkaran menutup → hala
 
 ## Fitur
 
-- **RAG per-bab** — 23 chunk dari 4 PDF resmi, jawaban nempel makna data.
-- **Pencarian semantik** — FAISS `IndexIDMap` + cosine similarity, threshold `0.55`, `top_k=15`.
-- **Normalisasi singkatan** — kahim, wakahim, sekum, bendum, kadep, dan imbuhan (`-nya/-ku/-mu`) dikenali sebelum embedding.
-- **Kepribadian Mimin** — mirror gaya bahasa user (gaul ↔ formal), format jawaban fleksibel (paragraf/poin/kombinasi), markdown dibatasi biar rapi di HP.
-- **Follow-up 2 saran** — tiap jawaban materi ditutup 2 topik lanjutan dari knowledge.
-- **Streaming (SSE)** — jawaban mengalir token-per-token lewat `POST /api/chat/stream`, plus mode non-stream biasa.
-- **Audit per-turn** — tabel `chat_audit` mencatat tiap pertanyaan: `user_id`, IP, endpoint, `hit_knowledge`, latensi, error, dan alasan miss (`oot`/`gatau`/`chit`).
-- **Rate limit** — `15/menit; 200/jam` per API, kuncinya ikut `user_id` biar maba di NAT kampus (satu IP rame-rame) tidak saling makan jatah.
-- **Batas pesan 500 karakter** — kepanjangan ditolak halus (413) biar hemat token.
-- **Sanitasi deterministik** — markdown berat (tabel pipa, code block, `---`, emoji) dilucuti sebelum disimpan dan saat streaming.
-- **Riwayat per-user** — tiap browser punya history sendiri (6 pesan terakhir dipakai sebagai konteks LLM), bisa dihapus kapan saja tanpa menyentuh audit.
-- **Sensor privasi** — atribut sensitif (NIM, ultah, sosmed, alamat) hanya keluar kalau user eksplisit menanyakannya.
-- **Transisi circle GPU** — animasi pakai `transform: scale()`, mulus di HP kentang.
-- **Responsif** — nyaman di HP maupun laptop.
-- **Production-ready** — gunicorn + endpoint `/health` buat watcher/monitor.
+- **RAG per-bab**: 23 chunk dari 4 PDF resmi, jawaban nempel makna data.
+- **Pencarian semantik**: FAISS `IndexIDMap` + cosine similarity, threshold `0.55`, `top_k=15`.
+- **Normalisasi singkatan**: kahim, wakahim, sekum, bendum, kadep, dan imbuhan (`-nya/-ku/-mu`) dikenali sebelum embedding.
+- **Kepribadian Mimin**: mirror gaya bahasa user (gaul ↔ formal), format jawaban fleksibel (paragraf/poin/kombinasi), markdown dibatasi biar rapi di HP.
+- **Follow-up 2 saran**: tiap jawaban materi ditutup 2 topik lanjutan dari knowledge.
+- **Streaming (SSE)**: jawaban mengalir token-per-token lewat `POST /api/chat/stream`, plus mode non-stream biasa.
+- **Audit per-turn**: tabel `chat_audit` mencatat tiap pertanyaan: `user_id`, IP, endpoint, `hit_knowledge`, latensi, error, dan alasan miss (`oot`/`gatau`/`chit`).
+- **Rate limit**: `15/menit; 200/jam` per API, kuncinya ikut `user_id` biar maba di NAT kampus (satu IP rame-rame) tidak saling makan jatah.
+- **Batas pesan 500 karakter**: kepanjangan ditolak halus (413) biar hemat token.
+- **Sanitasi deterministik**: markdown berat (tabel pipa, code block, `---`, emoji) dilucuti sebelum disimpan dan saat streaming.
+- **Riwayat per-user**: tiap browser punya history sendiri (6 pesan terakhir dipakai sebagai konteks LLM), bisa dihapus kapan saja tanpa menyentuh audit.
+- **Sensor privasi**: atribut sensitif (NIM, ultah, sosmed, alamat) hanya keluar kalau user eksplisit menanyakannya.
+- **Transisi circle GPU**: animasi pakai `transform: scale()`, mulus di HP kentang.
+- **Responsif**: nyaman di HP maupun laptop.
+- **Production-ready**: gunicorn + endpoint `/health` buat watcher/monitor.
 
 ---
 
@@ -110,10 +110,10 @@ PDF -> clean_text -> chunking per bab (heading bernomor + sub-split)
                     petik tag -> audit (chat_audit)
 ```
 
-1. **Ingestion** — PDF dibaca (pypdf), dibersihkan (dedup header tabel, perbaikan artefak spasi ekstraksi, em-dash jadi hyphen), lalu dipecah per bab mengikuti heading bernomor. Bab yang panjang dipecah lagi per sub-bagian. Hasil saat ini: **23 chunk**.
-2. **Indexing** — tiap chunk di-embedding pakai Jina (`jina-embeddings-v5-text-small`, 1024 dimensi), disimpan di SQLite, dan vektornya masuk index FAISS. `IndexIDMap` menjaga id FAISS sinkron dengan id SQLite. Tulis index atomik (`knowledge.index.tmp` → `knowledge.index`).
-3. **Query** — pertanyaan user dinormalisasi dulu (singkatan → istilah knowledge), di-embedding (LRU cache 512), lalu dicari dengan cosine similarity (`top_k=15`, lolos kalau skor ≥ `0.55`). Chunk yang lolos digabung jadi context, label internal `[Bab X]` dicopot biar Mimin tidak mengutip struktur dokumen ke user.
-4. **Generation** — context + 6 pesan riwayat terakhir + system prompt (~4,5rb karakter) dikirim ke LLM lewat 9router (fallback otomatis) atau langsung ke Groq. Jawaban ditutup 1 tag sistem (`[OK]`/`[GATAU]`/`[OOT]`/`[CHIT]`) yang dicopot sebelum tampil ke user tapi dicatat ke audit.
+1. **Ingestion**: PDF dibaca (pypdf), dibersihkan (dedup header tabel, perbaikan artefak spasi ekstraksi, em-dash jadi hyphen), lalu dipecah per bab mengikuti heading bernomor. Bab yang panjang dipecah lagi per sub-bagian. Hasil saat ini: **23 chunk**.
+2. **Indexing**: tiap chunk di-embedding pakai Jina (`jina-embeddings-v5-text-small`, 1024 dimensi), disimpan di SQLite, dan vektornya masuk index FAISS. `IndexIDMap` menjaga id FAISS sinkron dengan id SQLite. Tulis index atomik (`knowledge.index.tmp` → `knowledge.index`).
+3. **Query**: pertanyaan user dinormalisasi dulu (singkatan → istilah knowledge), di-embedding (LRU cache 512), lalu dicari dengan cosine similarity (`top_k=15`, lolos kalau skor ≥ `0.55`). Chunk yang lolos digabung jadi context, label internal `[Bab X]` dicopot biar Mimin tidak mengutip struktur dokumen ke user.
+4. **Generation**: context + 6 pesan riwayat terakhir + system prompt (~4,5rb karakter) dikirim ke LLM lewat 9router (fallback otomatis) atau langsung ke Groq. Jawaban ditutup 1 tag sistem (`[OK]`/`[GATAU]`/`[OOT]`/`[CHIT]`) yang dicopot sebelum tampil ke user tapi dicatat ke audit.
 
 ---
 
@@ -123,7 +123,7 @@ PDF -> clean_text -> chunking per bab (heading bernomor + sub-split)
 |---|---|
 | Backend | Python 3.10, Flask 3.1.3, gunicorn 23 (produksi), waitress 3.0.2 |
 | RAG / Vektor | faiss-cpu 1.14.3 (`IndexIDMap` + `IndexFlatIP`, cosine), numpy 2.2.6 |
-| Penyimpanan | SQLite (WAL) — tabel `history`, `knowledge`, `chat_audit` |
+| Penyimpanan | SQLite (WAL): tabel `history`, `knowledge`, `chat_audit` |
 | Embedding | Jina AI `jina-embeddings-v5-text-small` (1024-d) |
 | LLM | 9router `GPT-120B-Fallback` (fallback otomatis) / Groq `openai/gpt-oss-120b` via SDK OpenAI-compatible |
 | PDF | pypdf 6.14.2 |
@@ -182,7 +182,7 @@ gunicorn -w 2 --threads 8 --worker-class gthread --timeout 60 -b 0.0.0.0:5000 ap
 
 Cek health: `curl http://localhost:5000/health` → `{"status":"ok"}`.
 
-Catatan: saat pertama jalan, knowledge dibangun otomatis dari PDF (`build_knowledge()` memanggil API Jina — butuh `JINA_API_KEY` + koneksi). Di produksi, index di-prebuild sekali biar tidak cold-start.
+Catatan: saat pertama jalan, knowledge dibangun otomatis dari PDF (`build_knowledge()` memanggil API Jina, butuh `JINA_API_KEY` + koneksi). Di produksi, index di-prebuild sekali biar tidak cold-start.
 
 ---
 
@@ -222,7 +222,7 @@ Dibaca dari file `.env` di root project. Jangan pernah commit file ini.
 
 Total **23 chunk**. Data pribadi disensor: NIM, tanggal lahir lengkap, dan kontak selain dosen tidak keluar kecuali user eksplisit menanyakannya.
 
-Rebuild knowledge (misal habis ubah `rag.py` atau threshold): hapus `database.db` + `knowledge.index`, lalu restart `app.py` — atau panggil `rebuild_faiss()` manual.
+Rebuild knowledge (misal habis ubah `rag.py` atau threshold): hapus `database.db` + `knowledge.index`, lalu restart `app.py`, atau panggil `rebuild_faiss()` manual.
 
 ---
 
@@ -275,9 +275,9 @@ Patokan: miss `gatau` yang numpuk dengan pertanyaan mirip = sinyal tambah dokume
 ## Deploy Produksi
 
 - **Server**: VPS KVM-2 (1 CPU / 2 GB), Ubuntu 22.04, hostname `mintif.himatifuntara.com`.
-- **App**: gunicorn `-w 2 --threads 8 --worker-class gthread --timeout 60 --backlog 256` (I/O-bound nunggu Jina/Groq — threads yang menahan puluhan user, bukan jumlah worker).
+- **App**: gunicorn `-w 2 --threads 8 --worker-class gthread --timeout 60 --backlog 256` (I/O-bound nunggu Jina/Groq, threads yang menahan puluhan user, bukan jumlah worker).
 - **Depan**: Nginx (reverse proxy + TLS, `proxy_buffering off` + `proxy_read_timeout 90s` buat SSE) → gunicorn `:5000` → Flask.
-- **Integrasi web**: frontend Vue (repo terpisah) manggil `/api/*` via CORS (`FRONTEND_ORIGIN`), tombol back mengarah ke `HOME_URL`. URL LLM dan home di sisi Vue bersifat build-time (`VITE_MINTIF_API_URL`) — ganti URL wajib rebuild.
+- **Integrasi web**: frontend Vue (repo terpisah) manggil `/api/*` via CORS (`FRONTEND_ORIGIN`), tombol back mengarah ke `HOME_URL`. URL LLM dan home di sisi Vue bersifat build-time (`VITE_MINTIF_API_URL`), ganti URL wajib rebuild.
 - **Keamanan server**: user non-root + SSH key-only, UFW (22/80/443), fail2ban, SQLite WAL.
 - **Kapasitas**: nyaman 5-10 in-flight / 30-60 pengguna aktif santai; bottleneck di upstream LLM/embedding, bukan CPU.
 
@@ -287,7 +287,7 @@ Patokan: miss `gatau` yang numpuk dengan pertanyaan mirip = sinyal tambah dokume
 
 Bagian yang bikin project ini beda: seluruh codebase Mintif dikembangkan di dalam Android, bukan di PC.
 
-> Penting: Android di sini itu environment development, bukan platform target. Ini bukan aplikasi Android. Mintif tetap aplikasi web full-stack biasa — cuma kodenya ditulis, dites, dan di-debug dari Android.
+> Penting: Android di sini itu environment development, bukan platform target. Ini bukan aplikasi Android. Mintif tetap aplikasi web full-stack biasa, cuma kodenya ditulis, dites, dan di-debug dari Android.
 
 **Setup yang dipakai:**
 
@@ -301,14 +301,14 @@ Bagian yang bikin project ini beda: seluruh codebase Mintif dikembangkan di dala
 
 **Keterbatasan yang berhasil diatasi:**
 
-- **Layar kecil dan tanpa mouse** — alur keyboard-first, editor ringan.
-- **Resource terbatas** — build dan index dibuat seefisien mungkin, FAISS di-load hemat memori.
-- **Dependency native** — `faiss-cpu` di-build dan dites langsung di lingkungan Linux Android.
-- **Workflow remote** — semua commit, push, dan deploy jalan langsung dari Android ke GitHub/VPS.
+- **Layar kecil dan tanpa mouse**: alur keyboard-first, editor ringan.
+- **Resource terbatas**: build dan index dibuat seefisien mungkin, FAISS di-load hemat memori.
+- **Dependency native**: `faiss-cpu` di-build dan dites langsung di lingkungan Linux Android.
+- **Workflow remote**: semua commit, push, dan deploy jalan langsung dari Android ke GitHub/VPS.
 
 Ini bukan gimmick, ini constraint engineering yang nyata. Setiap fix bug, refactor, dan fitur di repo ini (108 commit) lahir dari Android.
 
-Karena Mintif aplikasi web biasa, dia tetap bisa dijalankan dan dikembangkan di platform apapun (Windows/macOS/Linux, Python 3.8+) — cukup `git clone` lalu ikuti panduan instalasi di atas.
+Karena Mintif aplikasi web biasa, dia tetap bisa dijalankan dan dikembangkan di platform apapun (Windows/macOS/Linux, Python 3.8+), cukup `git clone` lalu ikuti panduan instalasi di atas.
 
 ---
 
